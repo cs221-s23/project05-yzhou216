@@ -64,7 +64,6 @@ char *get_content(FILE *fp, char *fpath)
 	if (!content_buf)
 		return NULL;
 	fread(content_buf, 1, file_sz, fp);
-	fclose(fp);
 
 	return content_buf;
 }
@@ -203,7 +202,9 @@ int main(int argc, char **argv)
 			goto not_found_out;
 		}
 		char *cp = get_content(fp, relative_path);
+		fclose(fp);
 		send_response(new_fd, "200 OK", content_type, cp);
+		free(cp);
 
 		close(new_fd);
 
