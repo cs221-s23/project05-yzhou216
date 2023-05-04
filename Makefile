@@ -1,5 +1,5 @@
 PROG = project05
-OBJS = project05.o
+OBJS = project05v2.o
 TMP = $(PROG) $(OBJS) *.html *.tmp
 
 %.o: %.c
