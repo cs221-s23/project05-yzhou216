@@ -199,7 +199,7 @@ int main(int argc, char **argv)
 		FILE *fp = fopen(relative_path, "r");
 		if (!fp) {
 			send_response(new_fd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n");
-			goto not_found_out;
+			continue;
 		}
 		char *cp = get_content(fp, relative_path);
 		fclose(fp);
@@ -207,8 +207,6 @@ int main(int argc, char **argv)
 		free(cp);
 
 		close(new_fd);
-
-not_found_out:
 	}
 
 	close(fd);
