@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 		if (!strcmp(fpath, "/"))
 			strcat(relative_path, "index.html");
 
-		printf("relative path: %s\n\n\n", relative_path); /* debug */
+		printf("relative path: %s\n", relative_path); /* debug */
 
 		char content_type[33];
 		memset(content_type, 0, 33);
@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 				break;
 		}
 
-		printf("content type: %s\n", content_type);
+		printf("content type: %s\n\n\n\n", content_type); /* debug */
 
 		FILE *fp = fopen(relative_path, "r");
 		if (!fp) {
