@@ -85,6 +85,7 @@ int main(int argc, char **argv)
 			char http_req[MAX_HTTP_REQ_LEN];
 			memset(http_req, 0, MAX_HTTP_REQ_LEN);
 			read(connfd, http_req, MAX_HTTP_REQ_LEN);
+			printf("%s\n", http_req); /* debug */
 			if (strstr(http_req, "GET /"))
 				send_response(connfd, "200 OK", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Hello CS 221\n  </body>\n</html>\n");
 			else
