@@ -191,6 +191,9 @@ int main(int argc, char **argv)
 			case 3:
 				strncpy(content_type, "text/html", 32);
 				break;
+			case 4:
+				strncpy(content_type, "image/vnd.microsoft.icon", 32);
+				break;
 		}
 
 		printf("content type: %s\n", content_type);
