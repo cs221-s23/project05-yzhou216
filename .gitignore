@@ -1,0 +1,7 @@
+*
+
+!*.c
+!Makefile
+!port.txt
+!/tools/
+!.gitignore
