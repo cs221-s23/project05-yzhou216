@@ -84,10 +84,10 @@ int main(int argc, char **argv)
 			char buf[MAX_BUF];
 			memset(buf, 0, sizeof(buf));
 			read(connfd, buf, sizeof(buf));
-			if (strstr(buf, "GET /wrong"))
-				send_response(connfd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Not found\n  </body>\n</html>\n");
-			else
+			if (strstr(buf, "GET /"))
 				send_response(connfd, "200 OK", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Hello CS 221\n  </body>\n</html>\n");
+			else
+				send_response(connfd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Not found\n  </body>\n</html>\n");
 
 			close(connfd);
 		}
