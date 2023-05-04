@@ -39,17 +39,17 @@ int get_content_type(char *fpath)
 	if (dot == NULL) {
 		return -1;
 	}
-	if (strcmp(dot + 1, "html") == 0) {
+
+	if (!strcmp(dot + 1, "html"))
 		return 0;
-	} else if (strcmp(dot + 1, "css") == 0 || strcmp(dot + 1, "map") == 0) {
+	else if (!strcmp(dot + 1, "css") || !strcmp(dot + 1, "map"))
 		return 1;
-	} else if (strcmp(dot + 1, "png") == 0) {
+	else if (!strcmp(dot + 1, "png"))
 		return 2;
-	} else if (strcmp(dot + 1, "ico") == 0) {
+	else if (!strcmp(dot + 1, "ico"))
 		return 3;
-	} else {
+	else
 		return -1;
-	}
 }
 
 char *get_content(FILE *fp, char *fpath)
