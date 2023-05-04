@@ -11,6 +11,25 @@
 
 #define MAX_RESPONSE_LEN 4096
 #define MAX_HTTP_REQ_LEN 2048
+#define MAX_FILE_PATH_LEN 256
+
+/*
+ * Original http request will be destroyed by strseq, if the http request needs
+ * to be reused later, store it into a temp variable first and restore it after
+ * calling parse_req_to_file_path().
+ */
+int parse_req_to_file_path(char *fpath, char *http_req)
+{
+	char *method = strsep(&http_req, " ");
+	char *end = strsep(&http_req, " ");
+	if (!method || !end)
+		return 1;
+
+	memset(fpath, 0, MAX_FILE_PATH_LEN + 1);
+	strncpy(fpath, end, MAX_FILE_PATH_LEN);
+
+	return 0;
+}
 
 void send_response(int sockfd, const char *status, const char *content_type,
 		   const char *body)
@@ -82,11 +101,16 @@ int main(int argc, char **argv)
 					    (struct sockaddr *) &cliaddr,
 					    &clilen);
 
+			char fpath[MAX_FILE_PATH_LEN + 1];
 			char http_req[MAX_HTTP_REQ_LEN];
 			memset(http_req, 0, MAX_HTTP_REQ_LEN);
 			read(connfd, http_req, MAX_HTTP_REQ_LEN);
 			printf("%s\n", http_req); /* debug */
-			if (strstr(http_req, "GET /"))
+
+			parse_req_to_file_path(fpath, http_req);
+			printf("file path: %s\n", fpath); /* debug */
+
+			if (!strcmp(fpath, "/"))
 				send_response(connfd, "200 OK", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Hello CS 221\n  </body>\n</html>\n");
 			else
 				send_response(connfd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Not found\n  </body>\n</html>\n");
