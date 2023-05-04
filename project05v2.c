@@ -33,6 +33,21 @@ int parse_req_to_file_path(char *fpath, char *http_req)
 	return 0;
 }
 
+int get_content_type(char *fpath)
+{
+	char *dot = strrchr(fpath, '.');
+	if (dot == NULL) {
+		return -1;
+	}
+	if (strcmp(dot + 1, "html") == 0) {
+		return 0;
+	} else if (strcmp(dot + 1, "css") == 0) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
 char *get_content(FILE *fp, char *fpath)
 {
 	char *content_buf = 0;
@@ -156,13 +171,22 @@ int main(int argc, char **argv)
 
 		printf("relative path: %s\n\n\n", relative_path); /* debug */
 
+		char content_type[33];
+		memset(content_type, 0, 33);
+		if (get_content_type(relative_path) == 0)
+			strncpy(content_type, "text/html", 32);
+		else if (get_content_type(relative_path) == 1)
+			strncpy(content_type, "text/css", 32);
+
+		printf("content type: %s\n", content_type);
+
 		FILE *fp = fopen(relative_path, "r");
 		if (!fp) {
 			send_response(new_fd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n");
 			goto not_found_out;
 		}
 		char *cp = get_content(fp, relative_path);
-		send_response(new_fd, "200 OK", "text/html", cp);
+		send_response(new_fd, "200 OK", content_type, cp);
 
 		close(new_fd);
 
