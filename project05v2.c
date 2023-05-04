@@ -41,8 +41,12 @@ int get_content_type(char *fpath)
 	}
 	if (strcmp(dot + 1, "html") == 0) {
 		return 0;
-	} else if (strcmp(dot + 1, "css") == 0) {
+	} else if (strcmp(dot + 1, "css") == 0 || strcmp(dot + 1, "map") == 0) {
 		return 1;
+	} else if (strcmp(dot + 1, "png") == 0) {
+		return 2;
+	} else if (strcmp(dot + 1, "ico") == 0) {
+		return 3;
 	} else {
 		return -1;
 	}
@@ -173,10 +177,21 @@ int main(int argc, char **argv)
 
 		char content_type[33];
 		memset(content_type, 0, 33);
-		if (get_content_type(relative_path) == 0)
-			strncpy(content_type, "text/html", 32);
-		else if (get_content_type(relative_path) == 1)
-			strncpy(content_type, "text/css", 32);
+
+		switch (get_content_type(relative_path)) {
+			case 0:
+				strncpy(content_type, "text/html", 32);
+				break;
+			case 1:
+				strncpy(content_type, "text/css", 32);
+				break;
+			case 2:
+				strncpy(content_type, "image/png", 32);
+				break;
+			case 3:
+				strncpy(content_type, "text/html", 32);
+				break;
+		}
 
 		printf("content type: %s\n", content_type);
 
