@@ -9,7 +9,7 @@
 
 #define PORT 8148
 
-#define MAX_RESPONSE_LEN 4096
+#define MAX_RESPONSE_LEN 28672
 #define MAX_HTTP_REQ_LEN 2048
 #define MAX_FILE_PATH_LEN 256
 
@@ -29,6 +29,24 @@ int parse_req_to_file_path(char *fpath, char *http_req)
 	strncpy(fpath, end, MAX_FILE_PATH_LEN);
 
 	return 0;
+}
+
+char *get_content(FILE *fp, char *fpath)
+{
+	char *content_buf = 0;
+	long file_sz;
+
+	if (fp) {
+		fseek (fp, 0, SEEK_END);
+		file_sz = ftell(fp);
+		fseek (fp, 0, SEEK_SET);
+		content_buf = malloc(file_sz);
+		if (content_buf) {
+			fread(content_buf, 1, file_sz, fp);
+		}
+		fclose(fp);
+	}
+	return content_buf;
 }
 
 void send_response(int sockfd, const char *status, const char *content_type,
@@ -110,12 +128,24 @@ int main(int argc, char **argv)
 			parse_req_to_file_path(fpath, http_req);
 			printf("file path: %s\n", fpath); /* debug */
 
+			char relative_path[MAX_FILE_PATH_LEN] = "www/cs221.cs.usfca.edu";
+			strcat(relative_path, fpath);
 			if (!strcmp(fpath, "/"))
-				send_response(connfd, "200 OK", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Hello CS 221\n  </body>\n</html>\n");
-			else
-				send_response(connfd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Not found\n  </body>\n</html>\n");
+				strcat(relative_path, "index.html");
 
+			printf("relative path: %s\n\n\n", relative_path); /* debug */
+
+			FILE *fp = fopen(relative_path, "r");
+			if (!fp) {
+				send_response(connfd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n");
+				goto not_found_out;
+			}
+			char *cp = get_content(fp, relative_path);
+			send_response(connfd, "200 OK", "text/html", cp);
+
+			free(cp);
 			close(connfd);
+not_found_out:
 		}
 	}
 
