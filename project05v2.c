@@ -57,16 +57,15 @@ char *get_content(FILE *fp, char *fpath)
 	char *content_buf = 0;
 	long file_sz;
 
-	if (fp) {
-		fseek (fp, 0, SEEK_END);
-		file_sz = ftell(fp);
-		fseek (fp, 0, SEEK_SET);
-		content_buf = malloc(file_sz);
-		if (content_buf) {
-			fread(content_buf, 1, file_sz, fp);
-		}
-		fclose(fp);
-	}
+	fseek (fp, 0, SEEK_END);
+	file_sz = ftell(fp);
+	fseek (fp, 0, SEEK_SET);
+	content_buf = malloc(file_sz);
+	if (!content_buf)
+		return NULL;
+	fread(content_buf, 1, file_sz, fp);
+	fclose(fp);
+
 	return content_buf;
 }
 
