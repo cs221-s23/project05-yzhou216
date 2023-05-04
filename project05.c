@@ -10,7 +10,7 @@
 #define PORT 8148
 
 #define MAX_RESPONSE_LEN 4096
-#define MAX_BUF 1024
+#define MAX_HTTP_REQ_LEN 2048
 
 void send_response(int sockfd, const char *status, const char *content_type,
 		   const char *body)
@@ -81,10 +81,11 @@ int main(int argc, char **argv)
 			int connfd = accept(sockfd,
 					    (struct sockaddr *) &cliaddr,
 					    &clilen);
-			char buf[MAX_BUF];
-			memset(buf, 0, sizeof(buf));
-			read(connfd, buf, sizeof(buf));
-			if (strstr(buf, "GET /"))
+
+			char http_req[MAX_HTTP_REQ_LEN];
+			memset(http_req, 0, MAX_HTTP_REQ_LEN);
+			read(connfd, http_req, MAX_HTTP_REQ_LEN);
+			if (strstr(http_req, "GET /"))
 				send_response(connfd, "200 OK", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Hello CS 221\n  </body>\n</html>\n");
 			else
 				send_response(connfd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    Not found\n  </body>\n</html>\n");
