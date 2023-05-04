@@ -68,8 +68,7 @@ char *get_content(FILE *fp, char *fpath)
 	return content_buf;
 }
 
-void send_response(int sockfd, const char *status, const char *content_type,
-		   const char *body)
+void send_response(int sockfd, char *status, char *content_type, char *body)
 {
 	char response[MAX_RESPONSE_LEN];
 	snprintf(response, sizeof(response),
