@@ -1,3 +1,5 @@
+#include "project05.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -156,54 +158,56 @@ int main(int argc, char **argv)
 			exit(0);
 		}
 
-		char fpath[MAX_FILE_PATH_LEN + 1];
-		char http_req[MAX_HTTP_REQ_LEN];
-		memset(http_req, 0, MAX_HTTP_REQ_LEN);
+		struct request *request = malloc(sizeof(struct request));
+		memset(request, 0, sizeof(struct request));
+		struct response *response = malloc(sizeof(struct response));
+		memset(response, 0, sizeof(struct response));
+
+		char http_req[MAX_HTTP_REQ_LEN + 1];
+		memset(http_req, 0, MAX_HTTP_REQ_LEN + 1);
 		read(new_fd, http_req, MAX_HTTP_REQ_LEN);
 		printf("%s\n", http_req); /* debug */
 
-		parse_req_to_file_path(fpath, http_req);
-		printf("file path: %s\n", fpath); /* debug */
+		parse_req_to_file_path(request->uri, http_req);
+		printf("uri: %s\n", request->uri); /* debug */
 
-		char relative_path[MAX_FILE_PATH_LEN] = "www/cs221.cs.usfca.edu";
-		strcat(relative_path, fpath);
-		if (!strcmp(fpath, "/"))
-			strcat(relative_path, "index.html");
+		strncpy(request->path, "www/cs221.cs.usfca.edu", MAX_FILE_PATH_LEN);
+		strncat(request->path, request->uri, MAX_FILE_PATH_LEN);
+		if (!strcmp(request->uri, "/"))
+			strncat(request->path, "index.html", MAX_FILE_PATH_LEN);
+		printf("file path: %s\n", request->path); /* debug */
 
-		printf("relative path: %s\n", relative_path); /* debug */
-
-		char content_type[33];
-		memset(content_type, 0, 33);
-
-		switch (get_content_type(relative_path)) {
+		switch (get_content_type(request->path)) {
 			case 0:
-				strncpy(content_type, "text/html", 32);
+				strncpy(request->content_type, "text/html", 32);
 				break;
 			case 1:
-				strncpy(content_type, "text/css", 32);
+				strncpy(request->content_type, "text/css", 32);
 				break;
 			case 2:
-				strncpy(content_type, "image/png", 32);
+				strncpy(request->content_type, "image/png", 32);
 				break;
 			case 3:
-				strncpy(content_type, "text/html", 32);
+				strncpy(request->content_type, "text/html", 32);
 				break;
 			case 4:
-				strncpy(content_type, "image/vnd.microsoft.icon", 32);
+				strncpy(request->content_type, "image/vnd.microsoft.icon", 32);
 				break;
 		}
+		printf("content type: %s\n\n\n\n", request->content_type); /* debug */
 
-		printf("content type: %s\n\n\n\n", content_type); /* debug */
-
-		FILE *fp = fopen(relative_path, "r");
+		FILE *fp = fopen(request->path, "r");
 		if (!fp) {
-			send_response(new_fd, "404 Not Found", "text/html", "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n");
+			strncpy(response->status, "404 Not Found", MAX_STATUS_LEN);
+			strcpy(response->content, "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n");
+			send_response(new_fd, response->status, "text/html", response->content);
 			continue;
 		}
-		char *cp = get_content(fp, relative_path);
+		response->content = get_content(fp, request->path);
 		fclose(fp);
-		send_response(new_fd, "200 OK", content_type, cp);
-		free(cp);
+
+		send_response(new_fd, "200 OK", request->content_type, response->content);
+		free(response->content);
 
 		close(new_fd);
 	}
