@@ -191,6 +191,9 @@ int main(int argc, char **argv)
 			case 4:
 				strncpy(request->content_type, "image/vnd.microsoft.icon", MAX_CONTENT_TYPE_LEN);
 				break;
+			default:
+				strncpy(request->content_type, "application/octet-stream", MAX_CONTENT_TYPE_LEN);
+				break;
 		}
 		printf("content type: %s\n\n\n\n", request->content_type); /* debug */
 
