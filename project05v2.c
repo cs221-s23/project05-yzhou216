@@ -180,16 +180,16 @@ int main(int argc, char **argv)
 
 		switch (get_content_type(request->path)) {
 			case 0:
-				strncpy(request->content_type, "text/html", 32);
+				strncpy(request->content_type, "text/html", MAX_CONTENT_TYPE_LEN);
 				break;
 			case 1:
-				strncpy(request->content_type, "text/css", 32);
+				strncpy(request->content_type, "text/css", MAX_CONTENT_TYPE_LEN);
 				break;
 			case 2:
-				strncpy(request->content_type, "image/png", 32);
+				strncpy(request->content_type, "image/png", MAX_CONTENT_TYPE_LEN);
 				break;
 			case 4:
-				strncpy(request->content_type, "image/vnd.microsoft.icon", 32);
+				strncpy(request->content_type, "image/vnd.microsoft.icon", MAX_CONTENT_TYPE_LEN);
 				break;
 		}
 		printf("content type: %s\n\n\n\n", request->content_type); /* debug */
