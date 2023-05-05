@@ -48,8 +48,9 @@ int get_content_type(char *fpath)
 		return 1;
 	else if (!strcmp(dot + 1, "png"))
 		return 2;
+	/* return value 3 reserved for later updates */
 	else if (!strcmp(dot + 1, "ico"))
-		return 3;
+		return 4;
 	else
 		return -1;
 }
@@ -186,9 +187,6 @@ int main(int argc, char **argv)
 				break;
 			case 2:
 				strncpy(request->content_type, "image/png", 32);
-				break;
-			case 3:
-				strncpy(request->content_type, "text/html", 32);
 				break;
 			case 4:
 				strncpy(request->content_type, "image/vnd.microsoft.icon", 32);
