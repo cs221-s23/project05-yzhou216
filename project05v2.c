@@ -14,7 +14,7 @@
 #define PORT "8148"
 
 #define MAX_HTTP_REQ_LEN 2048
-#define MAX_RESPONSE_LEN 28672
+#define MAX_RESPONSE_LEN 262144
 
 /*
  * Original http request will be destroyed by strseq, if the http request needs
