@@ -46,40 +46,41 @@ int get_content_type(char *fpath)
 		return 1;
 	else if (!strcmp(dot + 1, "png"))
 		return 2;
-	/* return value 3 reserved for later updates */
+	else if (!strcmp(dot + 1, "jpg"))
+		return 3;
 	else if (!strcmp(dot + 1, "ico"))
 		return 4;
 	else
 		return -1;
 }
 
-char *get_content(FILE *fp, char *fpath)
+char *get_content(FILE *fp, char *fpath, size_t *file_sz)
 {
 	char *content_buf = 0;
-	long file_sz;
 
 	fseek (fp, 0, SEEK_END);
-	file_sz = ftell(fp);
+	*file_sz = ftell(fp);
 	fseek (fp, 0, SEEK_SET);
-	content_buf = malloc(file_sz);
+	content_buf = malloc(*file_sz);
 	if (!content_buf)
 		return NULL;
-	fread(content_buf, 1, file_sz, fp);
+	fread(content_buf, 1, *file_sz, fp);
 
 	return content_buf;
 }
 
-void send_response(int sockfd, char *status, char *content_type, char *body)
+void send_response(int sockfd, char *status, char *content_type, char *body, size_t file_sz)
 {
-	char response[MAX_RESPONSE_LEN];
-	snprintf(response, sizeof(response),
+	char header[MAX_RESPONSE_LEN];
+	snprintf(header, sizeof(header),
 		"HTTP/1.1 %s\r\n"
 		"Content-Type: %s\r\n"
 		"Content-Length: %d\r\n"
-		"\r\n"
-		"%s",
-		status, content_type, strlen(body), body);
-	send(sockfd, response, strlen(response), 0);
+		"\r\n",
+		status, content_type, file_sz);
+
+	send(sockfd, header, strlen(header), 0);
+	send(sockfd, body, MAX_RESPONSE_LEN, 0);
 }
 
 int main(int argc, char **argv)
@@ -186,6 +187,9 @@ int main(int argc, char **argv)
 			case 2:
 				strncpy(request->content_type, "image/png", MAX_CONTENT_TYPE_LEN);
 				break;
+			case 3:
+				strncpy(request->content_type, "image/jpeg", MAX_CONTENT_TYPE_LEN);
+				break;
 			case 4:
 				strncpy(request->content_type, "image/vnd.microsoft.icon", MAX_CONTENT_TYPE_LEN);
 				break;
@@ -195,20 +199,21 @@ int main(int argc, char **argv)
 		}
 		printf("content type: %s\n\n\n\n", request->content_type); /* debug */
 
+		size_t file_sz;
 		FILE *fp = fopen(request->path, "r");
 		if (!fp) {
 			strncpy(response->status, "404 Not Found", MAX_STATUS_LEN);
 			response->content = "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n";
-			send_response(new_fd, response->status, "text/html", response->content);
+			send_response(new_fd, response->status, "text/html", response->content, (size_t)strlen(response->content));
 
 			free(request);
 			free(response);
 			continue;
 		}
-		response->content = get_content(fp, request->path);
+		response->content = get_content(fp, request->path, &file_sz);
 		fclose(fp);
 
-		send_response(new_fd, "200 OK", request->content_type, response->content);
+		send_response(new_fd, "200 OK", request->content_type, response->content, file_sz);
 		free(response->content);
 
 		free(request);
