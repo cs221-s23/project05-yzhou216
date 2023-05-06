@@ -4,7 +4,7 @@
 #define MAX_STATUS_LEN 32
 
 struct request {
-	char uri[MAX_CONTENT_TYPE_LEN + 1];
+	char uri[MAX_URI_LEN + 1];
 	char path[MAX_FILE_PATH_LEN + 1];
 	char content_type[MAX_CONTENT_TYPE_LEN + 1];
 } request;
