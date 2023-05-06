@@ -14,7 +14,7 @@
 #define PORT "8148"
 
 #define MAX_HTTP_REQ_LEN 2048
-#define MAX_RESPONSE_LEN 262144
+#define MAX_HEADER_LEN 4096
 
 /*
  * Original http request will be destroyed by strseq, if the http request needs
@@ -71,7 +71,7 @@ char *get_content(FILE *fp, char *fpath, size_t *file_sz)
 
 void send_response(int sockfd, char *status, char *content_type, char *body, size_t file_sz)
 {
-	char header[MAX_RESPONSE_LEN];
+	char header[MAX_HEADER_LEN];
 	snprintf(header, sizeof(header),
 		"HTTP/1.1 %s\r\n"
 		"Content-Type: %s\r\n"
