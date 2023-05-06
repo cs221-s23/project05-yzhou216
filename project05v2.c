@@ -210,6 +210,9 @@ int main(int argc, char **argv)
 		send_response(new_fd, "200 OK", request->content_type, response->content);
 		free(response->content);
 
+		free(request);
+		free(response);
+
 		close(new_fd);
 	}
 
