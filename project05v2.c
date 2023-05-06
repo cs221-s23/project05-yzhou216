@@ -80,7 +80,7 @@ void send_response(int sockfd, char *status, char *content_type, char *body, siz
 		status, content_type, file_sz);
 
 	send(sockfd, header, strlen(header), 0);
-	send(sockfd, body, MAX_RESPONSE_LEN, 0);
+	send(sockfd, body, file_sz, 0);
 }
 
 int main(int argc, char **argv)
