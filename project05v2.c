@@ -13,9 +13,8 @@
 
 #define PORT "8148"
 
-#define MAX_RESPONSE_LEN 28672
 #define MAX_HTTP_REQ_LEN 2048
-#define MAX_FILE_PATH_LEN 256
+#define MAX_RESPONSE_LEN 28672
 
 /*
  * Original http request will be destroyed by strseq, if the http request needs
@@ -104,7 +103,7 @@ int main(int argc, char **argv)
 	for (r = results; r != NULL; r = r->ai_next) {
 		fd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
 		if (fd == -1)
-			continue;  // failed; try next addrinfo
+			continue;  /* failed; try next addrinfo */
 
 		int en = 1;
 		if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &en, sizeof(int)) == -1) {
