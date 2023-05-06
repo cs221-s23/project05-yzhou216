@@ -200,8 +200,11 @@ int main(int argc, char **argv)
 		FILE *fp = fopen(request->path, "r");
 		if (!fp) {
 			strncpy(response->status, "404 Not Found", MAX_STATUS_LEN);
-			strcpy(response->content, "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n");
+			response->content = "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n";
 			send_response(new_fd, response->status, "text/html", response->content);
+
+			free(request);
+			free(response);
 			continue;
 		}
 		response->content = get_content(fp, request->path);
