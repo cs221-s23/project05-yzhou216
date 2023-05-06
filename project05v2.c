@@ -28,7 +28,6 @@ int parse_req_to_file_path(char *fpath, char *http_req)
 	if (!method || !end)
 		return 1;
 
-	memset(fpath, 0, MAX_FILE_PATH_LEN + 1);
 	strncpy(fpath, end, MAX_FILE_PATH_LEN);
 
 	return 0;
