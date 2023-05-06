@@ -202,12 +202,15 @@ int main(int argc, char **argv)
 		size_t file_sz;
 		FILE *fp = fopen(request->path, "r");
 		if (!fp) {
-			strncpy(response->status, "404 Not Found", MAX_STATUS_LEN);
-			response->content = "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not found\n  </body>\n</html>\n";
-			send_response(new_fd, response->status, "text/html", response->content, (size_t)strlen(response->content));
+			char body[] = "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not Found\n  </body>\n</html>\n";
+			char header[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 64\r\n\r\n";
+
+			send(new_fd, header, strlen(header), 0);
+			send(new_fd, body, strlen(body), 0);
 
 			free(request);
 			free(response);
+			close(new_fd);
 			continue;
 		}
 		response->content = get_content(fp, request->path, &file_sz);
