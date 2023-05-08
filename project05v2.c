@@ -62,9 +62,22 @@ char *get_content(FILE *fp, char *fpath, size_t *file_sz)
 	*file_sz = ftell(fp);
 	fseek (fp, 0, SEEK_SET);
 	content_buf = malloc(*file_sz);
+	if (!content_buf) {
+		perror("malloc");
+		exit(-1);
+	}
+
 	if (!content_buf)
 		return NULL;
-	fread(content_buf, 1, *file_sz, fp);
+	size_t bytes_read = fread(content_buf, 1, *file_sz, fp);
+	if (bytes_read != *file_sz) {
+		if (feof(fp))
+			printf("End of file reached.\n");
+		else if (ferror(fp))
+			perror("fread");
+
+		exit(1);
+	}
 
 	return content_buf;
 }
@@ -79,8 +92,15 @@ void send_response(int sockfd, char *status, char *content_type, char *body, siz
 		"\r\n",
 		status, content_type, file_sz);
 
-	send(sockfd, header, strlen(header), 0);
-	send(sockfd, body, file_sz, 0);
+	if (send(sockfd, header, strlen(header), 0) == -1) {
+		perror("send");
+		exit(-1);
+	}
+
+	if (send(sockfd, body, file_sz, 0) == -1) {
+		perror("send");
+		exit(-1);
+	}
 }
 
 int main(int argc, char **argv)
@@ -159,8 +179,17 @@ int main(int argc, char **argv)
 		}
 
 		struct request *request = malloc(sizeof(struct request));
+		if (!request) {
+			perror("malloc");
+			exit(-1);
+		}
 		memset(request, 0, sizeof(struct request));
+
 		struct response *response = malloc(sizeof(struct response));
+		if (!response) {
+			perror("malloc");
+			exit(-1);
+		}
 		memset(response, 0, sizeof(struct response));
 
 		char http_req[MAX_HTTP_REQ_LEN + 1];
@@ -205,8 +234,15 @@ int main(int argc, char **argv)
 			char body[] = "<!DOCTYPE html>\n<html>\n  <body>\n    404 Not Found\n  </body>\n</html>\n";
 			char header[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 64\r\n\r\n";
 
-			send(new_fd, header, strlen(header), 0);
-			send(new_fd, body, strlen(body), 0);
+			if (send(new_fd, header, strlen(header), 0) == -1) {
+				perror("send");
+				exit(1);
+			}
+
+			if (send(new_fd, body, strlen(body), 0) == -1) {
+				perror("send");
+				exit(1);
+			}
 
 			free(request);
 			free(response);
