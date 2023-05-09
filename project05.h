@@ -1,3 +1,6 @@
+#ifndef _PROJECT05_H
+#define _PROJECT05_H
+
 #define MAX_URI_LEN 128
 #define MAX_FILE_PATH_LEN 256
 #define MAX_CONTENT_TYPE_LEN 32
@@ -13,3 +16,5 @@ struct response {
 	char status[MAX_STATUS_LEN + 1];
 	char *content;
 } response;
+
+#endif /* _PROJECT05_H */
